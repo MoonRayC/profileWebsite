@@ -1,4 +1,5 @@
 <?php
+require_once("function.php");
 require_once("logout.php");
 
 if (isset($_POST["logout"])) {
@@ -23,7 +24,7 @@ if (!isUserLoggedIn()) {
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark py-4">
     <div class="container">
-        <a class="navbar-brand" href="images/profilePic.png">
+        <a class="navbar-brand" href="profile.php">
             <img src="images/profilePic.png" alt="Logo" style="width: 50px; height: 50px;">
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,10 +47,13 @@ if (!isUserLoggedIn()) {
                 <li class="nav-item">
                     <a class="nav-link" href="carReservation.php">Car Reservation</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="carReservation.php">Car Reservation List</a>
+                </li>
             </ul>
         </div>
         <form method="post" class="ml-auto">
-            <button type="submit" name="logout" class="btn btn-light">Log Out</button>
+            <button type="submit" name="logout" class="btn btn-secondary">Log Out</button>
         </form>
     </div>
 </nav>
@@ -79,12 +83,12 @@ if (!isUserLoggedIn()) {
                             <div class="form-group">
                                 <label>Dining Options:</label>
                                 <div class="form-check">
-                                    <input type="checkbox" name="diningOption[]" class="form-check-input" value="Fine Dining">
+                                    <input type="checkbox" name="diningOption[]" class="form-check-input" value="Fine Dining" checked>
                                     <label class="form-check-label">Fine Dining</label>
                                 </div>
                                 <div class="form-check">
-                                    <input type="checkbox" name="diningOption[]" class="form-check-input" value="Casual Dining ">
-                                    <label class="form-check-label">Casual Dining </label>
+                                    <input type="checkbox" name="diningOption[]" class="form-check-input" value="Casual Dining">
+                                    <label class="form-check-label">Casual Dining</label>
                                 </div>
                                 <div class="form-check">
                                     <input type="checkbox" name="diningOption[]" class="form-check-input" value="Ghost Restaurant">
@@ -98,7 +102,7 @@ if (!isUserLoggedIn()) {
                             <div class="form-group">
                                 <label>Seating Preference:</label>
                                 <div class="form-check">
-                                    <input type="radio" name="seatingPreference" class="form-check-input" value="Family Style Seating">
+                                    <input type="radio" name="seatingPreference" class="form-check-input" value="Family Style Seating" checked>
                                     <label class="form-check-label">Family Style Seating</label>
                                 </div>
                                 <div class="form-check">
@@ -116,11 +120,11 @@ if (!isUserLoggedIn()) {
                             </div>
                             <div class="form-group">
                                 <label for="specialArrangements">Special Arrangements</label>
-                                <input type="text" name="specialArrangements" class="form-control">
+                                <input type="text" name="specialArrangements" class="form-control" maxlength="255">
                             </div>
                             <div class="form-group">
                                 <label for="additionalQuestions">Additional Questions/Inquiries</label>
-                                <input type="text" name="additionalQuestions" class="form-control">
+                                <input type="text" name="additionalQuestions" class="form-control" maxlength="255">
                             </div>
                             <button type="submit" class="btn btn-success btn-block">Submit</button>
                         </form>

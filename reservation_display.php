@@ -10,7 +10,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark py-4">
     <div class="container">
-        <a class="navbar-brand" href="images/profilePic.png">
+        <a class="navbar-brand" href="profile.php">
             <img src="images/profilePic.png" alt="Logo" style="width: 50px; height: 50px;">
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@
             </ul>
         </div>
         <form method="post" class="ml-auto">
-            <button type="submit" name="logout" class="btn btn-light">Log Out</button>
+            <button type="submit" name="logout" class="btn btn-secondary">Log Out</button>
         </form>
     </div>
 </nav>

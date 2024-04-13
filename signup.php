@@ -91,27 +91,27 @@ $conn = null;
                     <div class="card-body">
                         <form action="signup.php" method="post">
                             <div class="form-group">
-                                <label for="firstname">First Name</label>
+                                <label for="firstname">First Name:</label>
                                 <input type="text" name="firstname" class="form-control" id="firstname" placeholder="First Name" required>
                             </div>
                             <div class="form-group">
-                                <label for="lastname">Last Name</label>
+                                <label for="lastname">Last Name:</label>
                                 <input type="text" name="lastname" class="form-control" id="lastname" placeholder="Last Name" required>
                             </div>
                             <div class="form-group">
-                                <label for="username">User Name</label>
+                                <label for="username">Username:</label>
                                 <input type="text" name="username" class="form-control" id="username" placeholder="User Name" required>
                             </div>
                             <div class="form-group">
-                                <label for="email">Email</label>
+                                <label for="email">Email:</label>
                                 <input type="email" name="email" class="form-control" id="email" placeholder="Email" required>
                             </div>
                             <div class="form-group">
-                                <label for="password">Password</label>
+                                <label for="password">Password:</label>
                                 <input type="password" name="password" class="form-control" id="password" placeholder="Password" required>
                             </div>
                             <div class="form-group">
-                                <label for="confirmpassword">Confirm Password</label>
+                                <label for="confirmpassword">Confirm Password:</label>
                                 <input type="password" name="confirmpassword" class="form-control" id="confirmpassword" placeholder="Confirm Password" required>
                             </div>
                             <button type="submit" class="btn btn-success btn-block">Sign-up</button>

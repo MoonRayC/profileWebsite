@@ -1,58 +1,51 @@
+<!-- update.php -->
+
 <?php
-require_once("function.php");
-require_once("logout.php");
-
-if (isset($_POST["logout"])) {
-    logout();
-}
-
-if (!isUserLoggedIn()) {
-    header("Location: login.php");
-    exit;
-}
 require_once("dbConnection.php");
 
-$formSubmittedSuccessfully = false;
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $vehicleType = isset($_POST['vehicle-type']) && is_array($_POST['vehicle-type']) ? implode(", ", $_POST['vehicle-type']) : '';
-    $vehicleNumber = $_POST['vehicle-number'];
-    $vehicleMake = $_POST['vehicle-make'];
-    $vehicleModel = $_POST['vehicle-model'];
-    $serviceType = $_POST['service-type'];
-    $specialInstruction = $_POST['special-instruction'];
-    $firstName = $_POST['first-name'];
-    $lastName = $_POST['last-name'];
-    $phone = $_POST['phone'];
-    $email = $_POST['email'];
-    $appointmentDate = $_POST['appointment-date'];
-
-    $sql = "INSERT INTO car_service_bookings (vehicle_type, vehicle_number, vehicle_make, vehicle_model, service_type, special_instruction, first_name, last_name, phone, email, appointment_date)
-            VALUES (:vehicleType, :vehicleNumber, :vehicleMake, :vehicleModel, :serviceType, :specialInstruction, :firstName, :lastName, :phone, :email, :appointmentDate)";
-
-    $stmt = $conn->prepare($sql);
-
-    $stmt->bindParam(':vehicleType', $vehicleType);
-    $stmt->bindParam(':vehicleNumber', $vehicleNumber);
-    $stmt->bindParam(':vehicleMake', $vehicleMake);
-    $stmt->bindParam(':vehicleModel', $vehicleModel);
-    $stmt->bindParam(':serviceType', $serviceType);
-    $stmt->bindParam(':specialInstruction', $specialInstruction);
-    $stmt->bindParam(':firstName', $firstName);
-    $stmt->bindParam(':lastName', $lastName);
-    $stmt->bindParam(':phone', $phone);
-    $stmt->bindParam(':email', $email);
-    $stmt->bindParam(':appointmentDate', $appointmentDate);
+// Check if ID is provided in the URL
+if (isset($_GET['id'])) {
+    $reservationId = $_GET['id'];
 
     try {
+        $sql = "SELECT * FROM car_service_bookings WHERE id = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $reservationId);
         $stmt->execute();
-        $formSubmittedSuccessfully = true;
+
+        if ($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Extract data from the row
+            $vehicleType = explode(", ", $row['vehicle_type']);
+            $vehicleNumber = $row['vehicle_number'];
+            $vehicleMake = $row['vehicle_make'];
+            $vehicleModel = $row['vehicle_model'];
+            $serviceType = $row['service_type'];
+            $specialInstruction = $row['special_instruction'];
+            $firstName = $row['first_name'];
+            $lastName = $row['last_name'];
+            $phone = $row['phone'];
+            $email = $row['email'];
+            $appointmentDate = $row['appointment_date'];
+            $success = true;
+        } else {
+            $errorMessage = "No reservation found with the given ID.";
+        }
     } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
+        $errorMessage = "Error: " . $e->getMessage();
     }
-    $conn = null;
+} else {
+    $errorMessage = "ID not provided in the URL.";
 }
 
+// Display success or error message
+if (isset($success) && $success === true) {
+    $successMessage = "Reservation details retrieved successfully!";
+} else {
+    // You can use $errorMessage to display an error message in your HTML
+    echo $errorMessage;
+    exit; // exit the script if there's an error
+}
 ?>
 
 <!DOCTYPE html>
@@ -63,10 +56,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/style3.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>Car Reservation</title>
+    <title>Update Reservation</title>
 </head>
 
 <body>
+
     <nav class="navbar navbar-expand-lg navbar-dark py-4">
         <div class="container">
             <a class="navbar-brand" href="profile.php">
@@ -106,99 +100,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="container mt-5">
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header text-center bg-dark text-white">
-                        <h2>Car Service Booking Form</h2>
-                        <hr>
+                    <div class="card-header bg-dark text-white">
+                        <h2 class="card-title">Update Reservation</h2>
                     </div>
                     <div class="card-body">
-                        <form action="process_form.php" method="POST">
-                            <h2>Vehicle Information</h2>
+                        <form action="process_update.php" method="POST">
+                            <input type="hidden" name="reservation-id" value="<?php echo $reservationId; ?>" required>
+
                             <div class="form-group">
                                 <label for="vehicle-type">Vehicle Type:</label>
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <input type="checkbox" name="vehicle-type[]" value="Sedan"> Sedan
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input type="checkbox" name="vehicle-type[]" value="Sports Car"> Sports Car
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <input type="checkbox" name="vehicle-type[]" value="Coupe"> Coupe
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input type="checkbox" name="vehicle-type[]" value="Wagon"> Wagon
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <input type="checkbox" name="vehicle-type[]" value="Other"> Other
-                                    </div>
+                                    <?php
+                                    $vehicleTypes = array("Sedan", "Sports Car", "Coupe", "Wagon", "Other");
+                                    foreach ($vehicleTypes as $type) {
+                                        $checked = in_array($type, $vehicleType) ? 'checked' : '';
+                                        echo "<div class='col-md-6'>
+                                                <input type='checkbox' name='vehicle-type[]' value='$type' $checked> $type
+                                              </div>";
+                                    }
+                                    ?>
                                 </div>
                             </div>
+
                             <div class="form-group">
                                 <label for="vehicle-number">Vehicle Number:</label>
-                                <input type="text" class="form-control" name="vehicle-number">
+                                <input type="text" class="form-control" name="vehicle-number"
+                                    value="<?php echo $vehicleNumber; ?>" required>
                             </div>
                             <div class="form-group">
                                 <label for="vehicle-make">Make:</label>
-                                <input type="text" class="form-control" name="vehicle-make">
+                                <input type="text" class="form-control" name="vehicle-make"
+                                    value="<?php echo $vehicleMake; ?>" required>
                             </div>
                             <div class="form-group">
                                 <label for="vehicle-model">Model:</label>
-                                <input type="text" class="form-control" name="vehicle-model">
+                                <input type="text" class="form-control" name="vehicle-model"
+                                    value="<?php echo $vehicleModel; ?>" required>
                             </div>
-                            <div class="form-group">
+
+                            <div class=" form-group">
                                 <label for="service-type">Service Type:</label>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <select name="service-type" class="form-control">
-                                            <option value="Check the engine oil">Check the engine oil</option>
-                                            <option value="Oil filter replacement">Oil filter replacement</option>
-                                            <option value="Change the engine oil">Change the engine oil</option>
+                                            <option>~~SELECT~~</option>
+                                            <option value="Check the engine oil"
+                                                <?php echo ($serviceType == "Check the engine oil") ? 'selected' : ''; ?>>
+                                                Check the engine oil</option>
+                                            <option value="Oil filter replacement"
+                                                <?php echo ($serviceType == "Oil filter replacement") ? 'selected' : ''; ?>>
+                                                Oil filter replacement</option>
+                                            <option value="Change the engine oil"
+                                                <?php echo ($serviceType == "Change the engine oil") ? 'selected' : ''; ?>>
+                                                Change the engine oil</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="comments">Special Instructions:</label><br>
-                                <textarea class="form-control" name="special-instruction" rows="4"></textarea>
-                            </div>
+
                             <h2>Customer Information</h2>
                             <div class="form-group">
                                 <label for="name">Name:</label>
                                 <div class="row">
                                     <div class="col">
-                                        <input type="text" class="form-control" name="first-name" required>
+                                        <input type="text" class="form-control" name="first-name"
+                                            value="<?php echo $firstName; ?>" required>
                                         <p>First Name</p>
                                     </div>
                                     <div class="col">
-                                        <input type="text" class="form-control" name="last-name" required>
+                                        <input type="text" class="form-control" name="last-name"
+                                            value="<?php echo $lastName; ?>" required>
                                         <p>Last Name</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="phone">Phone Number:</label>
-                                <input type="text" class="form-control" name="phone" placeholder="(000) 000-0000">
+                                <input type="text" class="form-control" name="phone" placeholder="(000) 000-0000"
+                                    value="<?php echo $phone; ?>">
                             </div>
                             <div class="form-group">
                                 <label for="email">Email:</label>
-                                <input type="email" class="form-control" name="email">
+                                <input type="email" class="form-control" name="email" value="<?php echo $email; ?>">
                                 <p>example@example.com</p>
                             </div>
                             <div class="form-group">
                                 <label for="appointment-date">Appointment Date:</label>
                                 <input type="date" class="form-control" name="appointment-date"
-                                    style="text-transform: uppercase;">
+                                    value="<?php echo $appointmentDate; ?>" style="text-transform: uppercase;">
                             </div>
-                            <button type="submit" class="btn btn-success btn-block">Book Now</button>
+                            <button type="submit" class="btn btn-primary">Update Reservation</button>
+                            <button type="button" class="btn btn-danger"
+                                onclick="window.location.href='reservationlist.php'">Cancel</button>
                         </form>
                     </div>
-                </div>  
+                </div>
             </div>
         </div>
     </div>

@@ -1,5 +1,7 @@
 <?php
+require_once("function.php");
 require_once("logout.php");
+require_once("dbconnection.php");
 
 if (isset($_POST["logout"])) {
     logout();
@@ -9,6 +11,13 @@ if (!isUserLoggedIn()) {
     header("Location: login.php");
     exit;
 }
+
+$user_id = $_SESSION['user_id'];
+
+$stmt = $conn->prepare("SELECT firstname, lastname FROM users WHERE id = :user_id");
+$stmt->bindParam(":user_id", $user_id);
+$stmt->execute();
+$userData = $stmt->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -25,7 +34,7 @@ if (!isUserLoggedIn()) {
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark py-4">
         <div class="container">
-            <a class="navbar-brand" href="images/profilePic.png">
+            <a class="navbar-brand" href="profile.php">
                 <img src="images/profilePic.png" alt="Logo" style="width: 50px; height: 50px;">
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
@@ -49,10 +58,13 @@ if (!isUserLoggedIn()) {
                     <li class="nav-item">
                         <a class="nav-link" href="carReservation.php">Car Reservation</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="reservationlist.php">Car Reservation List</a>
+                    </li>
                 </ul>
             </div>
             <form method="post" class="ml-auto">
-                <button type="submit" name="logout" class="btn btn-light">Log Out</button>
+                <button type="submit" name="logout" class="btn btn-secondary">Log Out</button>
             </form>
         </div>
     </nav>
@@ -61,7 +73,7 @@ if (!isUserLoggedIn()) {
         <div class="content text-center">
             <div class="nameholder">
                 <h1>Welcome to My Personal Space</h1>
-                <h2>Hey, <?php echo $_SESSION["lastname"] . ", " . $_SESSION["firstname"]; ?>!</h2>
+                <h2>Hey, <?php echo $userData["firstname"] . " " . $userData["lastname"]; ?>!</h2>
                 <p>
                     I'm Raymond D. Chavez Jr., and I'm thrilled to have you here on my website. This is where I share my
                     journey, experiences, and a little bit of my world with you.
@@ -77,6 +89,22 @@ if (!isUserLoggedIn()) {
             </div>
         </div>
     </div>
+
+    <div class="success-alert top-right-alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+        <?php 
+    if (isset($_SESSION['formSubmittedSuccessfully']) && $_SESSION['formSubmittedSuccessfully']): ?>
+        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            Profile updated successfully!
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <?php 
+      unset($_SESSION['formSubmittedSuccessfully']);
+      ?>
+        <?php endif; ?>
+    </div>
+
     <footer class="footer text-center py-4">
         <p>Connect with me on social media:</p>
         <a href="https://twitter.com/Moon_RayC" class="btn btn-light">Twitter</a>
